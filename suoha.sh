@@ -158,7 +158,6 @@ then
 	else
 		kill -9 $(ps -ef | grep cloudflared-linux | grep -v grep | awk '{print $2}') >/dev/null 2>&1
 	fi
-	rm -rf argo.log
 	clear
 	echo argo获取超时,重试中
 	./cloudflared-linux tunnel --url http://localhost:$port --no-autoupdate --edge-ip-version $ips --protocol http2 >argo.log 2>&1 &
@@ -167,7 +166,6 @@ elif [ -z "$argo" ]
 then
 	sleep 1
 else
-	rm -rf argo.log
 	break
 fi
 done
@@ -198,7 +196,6 @@ then
 	echo 'vless://'$uuid'@speed.cloudflare.com:80?encryption=none&security=none&type=ws&host='$argo'&path='$urlpath'#'$(echo $isp | sed -e 's/_/%20/g' -e 's/,/%2C/g')'' >> v2ray.txt
 	echo -e '\n'端口 80 可改为 8080 8880 2052 2082 2086 2095 >> v2ray.txt
 fi
-rm -rf argo.log
 cat v2ray.txt
 echo -e '\n'信息已经保存在 v2ray.txt,再次查看请运行 cat v2ray.txt
 }

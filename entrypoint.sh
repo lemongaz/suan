@@ -35,7 +35,7 @@ generate_argo() {
 #!/usr/bin/env bash
 
 argo_type() {
-  if [[ -n "\${ARGO_AUTH}" && -n "\${ARGO_DOMAIN}" ]]; then
+  if [[ -n "\${ARGO_AUTH}" ]]; then
     [[ \$ARGO_AUTH =~ TunnelSecret ]] && echo \$ARGO_AUTH > ./tunnel.json && cat > ./tunnel.yml << EOF
 tunnel: \$(cut -d\" -f12 <<< \$ARGO_AUTH)
 credentials-file: ./tunnel.json
@@ -69,7 +69,7 @@ ABC
 }
 
 generate_pm2_file() {
-  if [[ -n "${ARGO_AUTH}" && -n "${ARGO_DOMAIN}" ]]; then
+  if [[ -n "${ARGO_AUTH}" ]]; then
     [[ "$ARGO_AUTH" =~ TunnelSecret ]] && ARGO_ARGS="tunnel --edge-ip-version auto --config ./tunnel.yml --url http://localhost:30070 run"
     [[ "$ARGO_AUTH" =~ ^[A-Z0-9a-z=]{120,250}$ ]] && ARGO_ARGS="tunnel --edge-ip-version auto --protocol http2 run --token ${ARGO_AUTH}"
   else

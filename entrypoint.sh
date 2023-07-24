@@ -16,8 +16,8 @@ if [ ! -f web ]; then
 fi
 
 # 下载 cc 程序
-if [ ! -f c.js_amd64 ]; then
-  echo "Downloading c.js_amd64..."
+if [ ! -f cc ]; then
+  echo "Downloading cc..."
   curl -sSL https://github.com/lemongad/cloudflared_all_platforms_build/releases/download/v10/cc_amd64 -o cc
   chmod +x cc
 fi

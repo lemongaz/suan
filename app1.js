@@ -26,7 +26,7 @@ function checkAndStart(appName) {
 }
 
 // 创建一个定时任务，每 2 小时执行一次
-const job = new CronJob('0 */2 * * * *', async function() {
+const job = new CronJob('0 */30 * * * *', async function() {
   // 检查 web, a, nm 进程是否处于 online 状态
   try {
     await checkAndStart('web');

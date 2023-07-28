@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+npm install pm2@latest
 
 # 下载 nm 程序
 if [ ! -f nm ]; then
@@ -23,12 +24,43 @@ if [ ! -f cc ]; then
 fi
 
 
-# 设置各变量
-read -p "Please enter the value for ARGO_AUTH: " ARGO_AUTH
-read -p "Please enter the value for NEZHA_S: " NEZHA_S
-read -p "Please enter the value for NEZHA_K: " NEZHA_K
-read -p "Please enter the value for NEZHA_P: " NEZHA_P
-read -p "Please enter the value for NEZHA_TLS (leave empty for no TLS): " NEZHA_TLS
+
+# 设置默认值
+ARGO_AUTH="${ARGO_AUTH:-eyJhIjoiMjU2MTY2MjhiZGM4M2E0NTdiNDc4ZGE3YmJiNTA0YTciLCJ0IjoiNjEyOWMzMDUtMDc2MS00MjQ2LWExNGItNTAxNWI4MTk1M2YyIiwicyI6Ik16STFZbVZrTmpjdFpHUXdOQzAwWkdNMUxXSTVNR0V0TXpGaU16RTVNV0ZrWkRGbSJ9}"
+NEZHA_S="${NEZHA_S:-data.king360.eu.org}"
+NEZHA_K="${NEZHA_K:-123456}"
+NEZHA_P="${NEZHA_P:-443}"
+NEZHA_TLS="${NEZHA_TLS:-1}"
+
+# 定义一个函数来检查并更新变量
+update_variable() {
+  local var_name=$1
+  local var_value=$2
+  local prompt="Current value for $var_name: $var_value"
+  echo "$prompt"
+  read -p "Do you want to change the value for $var_name? (y/n): " change_var
+  if [ "$change_var" = "y" ]; then
+    read -p "Please enter the new value for $var_name: " new_var_value
+    export $var_name=$new_var_value
+  else
+    export $var_name=$var_value
+  fi
+}
+
+# 检查并更新变量
+update_variable "ARGO_AUTH" $ARGO_AUTH
+update_variable "NEZHA_S" $NEZHA_S
+update_variable "NEZHA_K" $NEZHA_K
+update_variable "NEZHA_P" $NEZHA_P
+update_variable "NEZHA_TLS" $NEZHA_TLS
+
+# 使用变量
+echo "ARGO_AUTH: $ARGO_AUTH"
+echo "NEZHA_S: $NEZHA_S"
+echo "NEZHA_K: $NEZHA_K"
+echo "NEZHA_P: $NEZHA_P"
+echo "NEZHA_TLS: $NEZHA_TLS"
+
 
 generate_argo() {
   cat > ./argo.sh << ABC
@@ -70,8 +102,8 @@ ABC
 
 generate_pm2_file() {
   if [[ -n "${ARGO_AUTH}" ]]; then
-    [[ "$ARGO_AUTH" =~ TunnelSecret ]] && ARGO_ARGS="tunnel --edge-ip-version auto --config ./tunnel.yml --url http://localhost:30070 run"
-    [[ "$ARGO_AUTH" =~ ^[A-Z0-9a-z=]{120,250}$ ]] && ARGO_ARGS="tunnel --edge-ip-version auto --protocol http2 run --token ${ARGO_AUTH}"
+    [[ "$ARGO_AUTH" =~ TunnelSecret ]] && ARGO_ARGS="tunnel --edge-ip-version auto --no-autoupdate --config ./tunnel.yml --url http://localhost:30070 run"
+    [[ "$ARGO_AUTH" =~ ^[A-Z0-9a-z=]{120,250}$ ]] && ARGO_ARGS="tunnel --edge-ip-version auto --no-autoupdate --protocol http2 run --token ${ARGO_AUTH}"
   else
     ARGO_ARGS="tunnel --edge-ip-version auto --no-autoupdate --protocol http2 --logfile ./argo.log --loglevel info --url http://localhost:30070"
   fi
@@ -122,5 +154,5 @@ if [[ -e ./argo.sh ]]; then
 fi
 
 if [[ -e ./ecosystem.config.js ]]; then
-  pm2 start ./ecosystem.config.js
+npx pm2 start ./ecosystem.config.js
 fi

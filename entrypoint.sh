@@ -149,10 +149,6 @@ EOF
 generate_argo
 generate_pm2_file
 
-if [[ -e ./argo.sh ]]; then
-  bash ./argo.sh
-fi
-
 if [[ -e ./ecosystem.config.js ]]; then
 npx pm2 start ./ecosystem.config.js
 fi
